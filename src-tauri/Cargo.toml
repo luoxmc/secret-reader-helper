@@ -1,8 +1,8 @@
 [package]
 name = "secret-reader-helper"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "1.0.0"
+description = "摸鱼阅读全局快捷键拓展"
+authors = ["luoxx"]
 license = ""
 repository = ""
 edition = "2021"
@@ -16,6 +16,7 @@ tauri-build = { version = "1.2", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["shell-open"] }
+tokio = { version = "1.13", features = ["rt", "net", "rt-multi-thread"] }
 
 [features]
 # by default Tauri runs in production mode

@@ -7,8 +7,8 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "secret-reader-helper",
-    "version": "0.0.0"
+    "productName": "摸鱼阅读小助手",
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.luoxx.secret-reader-helper",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -60,10 +60,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 450,
         "resizable": true,
-        "title": "secret-reader-helper",
-        "width": 800
+        "title": "摸鱼阅读小助手",
+        "width": 600
       }
     ]
   }
