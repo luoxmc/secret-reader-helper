@@ -1,18 +1,29 @@
 <script setup>
-// import Greet from "./components/Greet.vue";
+import { register,unregister } from '@tauri-apps/api/globalShortcut';
+import { ref } from "vue"
+import { invoke } from "@tauri-apps/api/tauri";
+
+let closeReader = ref(localStorage.getItem('short-cut-closeReader'))
+let toggleReader = ref(localStorage.getItem('short-cut-toggleReader'))
+let prevPage = ref(localStorage.getItem('short-cut-prevPage'))
+let nextPage = ref(localStorage.getItem('short-cut-nextPage'))
+let toggleAuto = ref(localStorage.getItem('short-cut-toggleAuto'))
+
+const isWin = (navigator.platform === "Win32") || (navigator.platform === "Windows")
+const isMac = (navigator.platform === "Mac68K") || (navigator.platform === "MacPPC") || (navigator.platform === "Macintosh") || (navigator.platform === "MacIntel")
 
 let getCommandStr = () => {
   let btn = "Meta+"
-  if(window.platform.isMacOs){
+  if(isMac){
     btn = 'Command+'
-  } else if (window.platform.isWindows){
+  } else if (isWin){
     btn = 'Win+'
   }
   return btn;
 }
 let getOptionStr = () => {
   let btn = "Alt+"
-  if(window.platform.isMacOs){
+  if(isMac){
     btn = 'Option+'
   }
   return btn;
@@ -20,15 +31,76 @@ let getOptionStr = () => {
 
 let keyFunc = (e) => {
   let ctrl = e.ctrlKey,shift = e.shiftKey,alt = e.altKey,meta = e.metaKey;
-  let connect = (meta ? getCommandStr() : "" ) +  (ctrl ? "Control+" : "" ) + (alt ? getOptionStr() : "" ) + (shift ? "Shift+" : "" );
+  let connect = (meta ? getCommandStr() : "" ) +  (ctrl ? "Control+" : "" )
+      + (alt ? getOptionStr() : "" ) + (shift ? "Shift+" : "" )
   if(e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift'){
-    connect = connect + e.key;
+    let code = e.code
+    if (code.indexOf('Key') !== -1) {
+      code = code.replace('Key','')
+    }
+    connect = connect + code;
   }
-  return connect;
+  if (focusId === 'closeReader') {
+    closeReader.value = connect
+  } else if (focusId === 'toggleReader') {
+    toggleReader.value = connect
+  } else if (focusId === 'prevPage') {
+    prevPage.value = connect
+  } else if (focusId === 'nextPage') {
+    nextPage.value = connect
+  } else if (focusId === 'toggleAuto') {
+    toggleAuto.value = connect
+  }
+  e.preventDefault()
 }
 
+let focusId = ''
+let beforeValue = ''
 function inputFocus (e)  {
-  console.log(e)
+  focusId = e.target.id
+  beforeValue = e.target._value
+  document.addEventListener('keydown', keyFunc)
+}
+async function inputBlur(e) {
+  let curValue = e.target._value
+  if (!curValue || curValue.endsWith('+')) {
+    if (focusId === 'closeReader') {
+      closeReader.value = beforeValue
+    } else if (focusId === 'toggleReader') {
+      toggleReader.value = beforeValue
+    } else if (focusId === 'prevPage') {
+      prevPage.value = beforeValue
+    } else if (focusId === 'nextPage') {
+      nextPage.value = beforeValue
+    } else if (focusId === 'toggleAuto') {
+      toggleAuto.value = beforeValue
+    }
+  } else if (curValue !== beforeValue) {
+    let key = 'short-cut-' + focusId
+    let shortCut = localStorage.getItem(key)
+    if (shortCut) {
+      await unregister(shortCut)
+    }
+    let sendMsg = 'type='
+    if (focusId === 'closeReader') {
+      sendMsg += '1'
+    } else if (focusId === 'toggleReader') {
+      sendMsg += '2'
+    } else if (focusId === 'prevPage') {
+      sendMsg += '4&content=prev'
+    } else if (focusId === 'nextPage') {
+      sendMsg += '4&content=next'
+    } else if (focusId === 'toggleAuto') {
+      sendMsg += '3'
+    }
+    await register(curValue, async () => {
+      await invoke("send_tcp_msg", {msg: sendMsg})
+    });
+    localStorage.setItem(key, curValue)
+  }
+  focusId = ''
+  beforeValue = ''
+  document.removeEventListener('keydown', keyFunc)
 }
 
 </script>
@@ -44,21 +116,36 @@ function inputFocus (e)  {
 
     <a-row style="margin-top: 2rem;">
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="关闭阅读器" /></a-col>
-      <a-col :span="8"><a-input v-model:value="value" placeholder="Basic usage" class="key-input" @focus="inputFocus" /></a-col>
+      <a-col :span="8">
+        <a-input v-model:value="closeReader" placeholder="请点击后录入快捷键" class="key-input" id="closeReader"
+                 @focus="inputFocus" @blur="inputBlur" readOnly />
+      </a-col>
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="显示/隐藏阅读器" /></a-col>
-      <a-col :span="8"><a-input v-model:value="value" placeholder="Basic usage" class="key-input" /></a-col>
+      <a-col :span="8">
+        <a-input v-model:value="toggleReader" placeholder="请点击后录入快捷键" class="key-input" id="toggleReader"
+                 @focus="inputFocus" @blur="inputBlur" readOnly />
+      </a-col>
     </a-row>
 
     <a-row style="margin-top: 2rem;">
-      <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="上一页" /></a-col>
-      <a-col :span="8"><a-input v-model:value="value" placeholder="Basic usage" class="key-input" /></a-col>
-      <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="下一页" /></a-col>
-      <a-col :span="8"><a-input v-model:value="value" placeholder="Basic usage" class="key-input" /></a-col>
+      <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="上一页" @focus="inputFocus" /></a-col>
+      <a-col :span="8">
+        <a-input v-model:value="prevPage" placeholder="请点击后录入快捷键" class="key-input" id="prevPage"
+                 @focus="inputFocus" @blur="inputBlur" readOnly />
+      </a-col>
+      <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="下一页" @focus="inputFocus" /></a-col>
+      <a-col :span="8">
+        <a-input v-model:value="nextPage" placeholder="请点击后录入快捷键" class="key-input" id="nextPage"
+                 @focus="inputFocus" @blur="inputBlur" readOnly />
+      </a-col>
     </a-row>
 
     <a-row style="margin-top: 2rem;">
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="启/停自动翻页" /></a-col>
-      <a-col :span="8"><a-input v-model:value="value" placeholder="Basic usage" class="key-input" /></a-col>
+      <a-col :span="8">
+        <a-input v-model:value="toggleAuto" placeholder="请点击后录入快捷键" class="key-input" id="toggleAuto"
+                 @focus="inputFocus" @blur="inputBlur" readOnly />
+      </a-col>
     </a-row>
   </div>
 </template>

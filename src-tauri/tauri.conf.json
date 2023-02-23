@@ -16,6 +16,9 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "globalShortcut": {
+        "all": true
       }
     },
     "bundle": {
@@ -60,11 +63,15 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 450,
+        "height": 460,
         "resizable": true,
         "title": "摸鱼阅读小助手",
-        "width": 600
+        "width": 800
       }
-    ]
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
   }
 }
