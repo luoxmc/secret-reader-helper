@@ -23,13 +23,6 @@ fn main() {
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
-//     tauri::Builder::default()
-//         .system_tray(system_tray)
-//         .on_system_tray_event(|app, event| menu_handle(app, event))
-//         .invoke_handler(tauri::generate_handler![send_tcp_msg])
-//         .run(tauri::generate_context!())
-//         .expect("error while running application");
-
     tauri::Builder::default()
             .system_tray(system_tray)
             .on_system_tray_event(|app, event| menu_handle(app, event))
