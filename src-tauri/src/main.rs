@@ -13,11 +13,6 @@ async fn send_tcp_msg(msg: String) {
     stream.try_write(msg.as_bytes()).unwrap();
 }
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 fn main() {
     let quit = CustomMenuItem::new("quit".to_string(), "关闭窗口");
     let hide = CustomMenuItem::new("hide".to_string(), "隐藏窗口");
@@ -28,12 +23,26 @@ fn main() {
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
+//     tauri::Builder::default()
+//         .system_tray(system_tray)
+//         .on_system_tray_event(|app, event| menu_handle(app, event))
+//         .invoke_handler(tauri::generate_handler![send_tcp_msg])
+//         .run(tauri::generate_context!())
+//         .expect("error while running application");
+
     tauri::Builder::default()
-        .system_tray(system_tray)
-        .on_system_tray_event(|app, event| menu_handle(app, event))
-        .invoke_handler(tauri::generate_handler![greet,send_tcp_msg])
-        .run(tauri::generate_context!())
-        .expect("error while running application");
+            .system_tray(system_tray)
+            .on_system_tray_event(|app, event| menu_handle(app, event))
+            .build(tauri::generate_context!())
+            .expect("error while running tauri application")
+            .run(|_app_handle, event| match event {
+                tauri::RunEvent::ExitRequested {
+                    api, ..
+                } => {
+                    api.prevent_exit();
+                }
+                _ => {}
+            });
 }
 
 fn menu_handle(app_handle: &tauri::AppHandle, event: SystemTrayEvent) {
