@@ -166,6 +166,12 @@ async function inputBlur(e) {
 <style scoped>
 .container{
   padding: 2rem;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .container .label{
   line-height: 32px;

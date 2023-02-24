@@ -83,6 +83,7 @@ fn menu_handle(app_handle: &tauri::AppHandle, event: SystemTrayEvent) {
                     item_handle.set_title("显示窗口").unwrap();
                 } else {
                     window.show().unwrap();
+                    window.set_focus().unwrap();
                     item_handle.set_title("隐藏窗口").unwrap();
                 }
             }
