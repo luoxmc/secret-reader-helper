@@ -29,7 +29,12 @@ let getOptionStr = () => {
   return btn;
 }
 
+
+
+let focusId = ''
+let beforeValue = ''
 let keyFunc = (e) => {
+  console.log('keydown',focusId)
   let ctrl = e.ctrlKey,shift = e.shiftKey,alt = e.altKey,meta = e.metaKey;
   let connect = (meta ? getCommandStr() : "" ) +  (ctrl ? "Control+" : "" )
       + (alt ? getOptionStr() : "" ) + (shift ? "Shift+" : "" )
@@ -54,53 +59,61 @@ let keyFunc = (e) => {
   e.preventDefault()
 }
 
-let focusId = ''
-let beforeValue = ''
 function inputFocus (e)  {
-  focusId = e.target.id
-  beforeValue = e.target._value
-  document.addEventListener('keydown', keyFunc)
+  console.log('focus', e)
+  setTimeout(() => {
+    focusId = e.target.id
+    beforeValue = e.target._value
+    document.addEventListener('keydown', keyFunc)
+  },40)
 }
 async function inputBlur(e) {
+  console.log('blur',e)
+  document.removeEventListener('keydown', keyFunc)
+  let tmpFocusId = focusId
+  let tmpBeforeValue = beforeValue
+  focusId = ''
+  beforeValue = ''
   let curValue = e.target._value
   if (!curValue || curValue.endsWith('+')) {
-    if (focusId === 'closeReader') {
-      closeReader.value = beforeValue
-    } else if (focusId === 'toggleReader') {
-      toggleReader.value = beforeValue
-    } else if (focusId === 'prevPage') {
-      prevPage.value = beforeValue
-    } else if (focusId === 'nextPage') {
-      nextPage.value = beforeValue
-    } else if (focusId === 'toggleAuto') {
-      toggleAuto.value = beforeValue
+    if (tmpFocusId === 'closeReader') {
+      closeReader.value = tmpBeforeValue
+    } else if (tmpFocusId === 'toggleReader') {
+      toggleReader.value = tmpBeforeValue
+    } else if (tmpFocusId === 'prevPage') {
+      prevPage.value = tmpBeforeValue
+    } else if (tmpFocusId === 'nextPage') {
+      nextPage.value = tmpBeforeValue
+    } else if (tmpFocusId === 'toggleAuto') {
+      toggleAuto.value = tmpBeforeValue
     }
-  } else if (curValue !== beforeValue) {
-    let key = 'short-cut-' + focusId
+  } else if (curValue === tmpBeforeValue) {
+
+  } else {
+    let key = 'short-cut-' + tmpFocusId
     let shortCut = localStorage.getItem(key)
     if (shortCut) {
       await unregister(shortCut)
     }
     let sendMsg = 'type='
-    if (focusId === 'closeReader') {
+    if (tmpFocusId === 'closeReader') {
       sendMsg += '1'
-    } else if (focusId === 'toggleReader') {
+    } else if (tmpFocusId === 'toggleReader') {
       sendMsg += '2'
-    } else if (focusId === 'prevPage') {
+    } else if (tmpFocusId === 'prevPage') {
       sendMsg += '4&content=prev'
-    } else if (focusId === 'nextPage') {
+    } else if (tmpFocusId === 'nextPage') {
       sendMsg += '4&content=next'
-    } else if (focusId === 'toggleAuto') {
+    } else if (tmpFocusId === 'toggleAuto') {
       sendMsg += '3'
     }
     await register(curValue, async () => {
+      console.log("key trigger:",sendMsg)
       await invoke("send_tcp_msg", {msg: sendMsg})
     });
     localStorage.setItem(key, curValue)
   }
-  focusId = ''
-  beforeValue = ''
-  document.removeEventListener('keydown', keyFunc)
+
 }
 
 </script>
@@ -110,7 +123,7 @@ async function inputBlur(e) {
     <a-alert
         message="使用说明"
         description="本软件为uTools插件《摸鱼阅读》的辅助工具，致力于解决在使用摸鱼阅读的全局快捷键时会闪uTools输入框的问题。
-        只需要在本软件设置好相应的快捷键，就可以在《摸鱼阅读》插件的阅读窗口打开的，使用本软件的快捷键来进行阅读窗口的显示、隐藏、翻页等操作。"
+        只需要在本软件设置好相应的快捷键，就可以在《摸鱼阅读》插件的阅读窗口打开时，使用本软件的快捷键来进行阅读窗口的显示、隐藏、翻页等操作。"
         type="info" show-icon
     />
 

@@ -14,18 +14,19 @@ async fn send_tcp_msg(msg: String) {
 }
 
 fn main() {
-    let quit = CustomMenuItem::new("quit".to_string(), "关闭窗口");
     let hide = CustomMenuItem::new("hide".to_string(), "隐藏窗口");
+    let quit = CustomMenuItem::new("quit".to_string(), "退出");
     let tray_menu = SystemTrayMenu::new()
-        .add_item(quit)
+        .add_item(hide)
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(hide);
+        .add_item(quit);
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
             .system_tray(system_tray)
             .on_system_tray_event(|app, event| menu_handle(app, event))
+            .invoke_handler(tauri::generate_handler![send_tcp_msg])
             .build(tauri::generate_context!())
             .expect("error while running tauri application")
             .run(|app, event| match event {
