@@ -58,7 +58,9 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": ["https://github.com/luoxmc/secret-reader-helper.git"],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg5RkRCMEI0MjFERUFFNkUKUldSdXJ0NGh0TEQ5aVFjdVBIK1JWbHdFcFhXR3ZyeE9aVmc2RW1tTXNrWDRBVEFHMW0yZmlMM04K"
     },
     "windows": [
       {

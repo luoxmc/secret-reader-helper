@@ -28,12 +28,21 @@ fn main() {
             .on_system_tray_event(|app, event| menu_handle(app, event))
             .build(tauri::generate_context!())
             .expect("error while running tauri application")
-            .run(|_app_handle, event| match event {
-                tauri::RunEvent::ExitRequested {
-                    api, ..
-                } => {
-                    api.prevent_exit();
-                }
+            .run(|app, event| match event {
+                tauri::RunEvent::WindowEvent {
+                    label,
+                    event: win_event,
+                    ..
+                } => match win_event {
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        let win = app.get_window(label.as_str()).unwrap();
+                        let item_handle = app.tray_handle().get_item("hide");
+                        item_handle.set_title("显示窗口").unwrap();
+                        win.hide().unwrap();
+                        api.prevent_close();
+                    }
+                    _ => {}
+                },
                 _ => {}
             });
 }
