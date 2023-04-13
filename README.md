@@ -1,7 +1,3 @@
-# Tauri + Vue 3
+# 摸鱼阅读小助手
 
-This template should help get you started developing with Tauri + Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+uTools执行全局快捷键会闪主输入框和插件主界面，体验很差。所以我开发了一个软件，专门用于执行摸鱼阅读内的一些快捷键，以替换uTools全局快捷键的功能，当然如果你不想装额外的软件，也可以使用uTools的全局快捷键（介绍看下文）。摸鱼阅读小助手的具体介绍以及软件下载请看： https://www.luoxx.top/archives/reader-helper
