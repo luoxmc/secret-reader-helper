@@ -12,6 +12,42 @@ let toggleAuto = ref(localStorage.getItem('short-cut-toggleAuto'))
 const isWin = (navigator.platform === "Win32") || (navigator.platform === "Windows")
 const isMac = (navigator.platform === "Mac68K") || (navigator.platform === "MacPPC") || (navigator.platform === "Macintosh") || (navigator.platform === "MacIntel")
 
+initKeyListener()
+
+async function initKeyListener() {
+  let storage = localStorage
+  if (storage && storage.length > 0) {
+    for (let i = 0; i < storage.length; i++) {
+      let keyName = storage.key(i)
+      if (keyName.startsWith('short-cut')) {
+        let keyValue = localStorage.getItem(keyName)
+        if (!keyValue) {
+          continue
+        }
+        let sendMsg = 'type='
+        if (keyName === 'short-cut-closeReader') {
+          sendMsg += '1'
+        } else if (keyName === 'short-cut-toggleReader') {
+          sendMsg += '2'
+        } else if (keyName === 'short-cut-prevPage') {
+          sendMsg += '4&content=prev'
+        } else if (keyName === 'short-cut-nextPage') {
+          sendMsg += '4&content=next'
+        } else if (keyName === 'short-cut-toggleAuto') {
+          sendMsg += '3'
+        }
+        if (sendMsg === 'type=') {
+          continue
+        }
+        await register(keyValue, async () => {
+          console.log("key trigger:",sendMsg)
+          await invoke("send_tcp_msg", {msg: sendMsg})
+        });
+      }
+    }
+  }
+}
+
 let getCommandStr = () => {
   let btn = "Meta+"
   if(isMac){
@@ -28,7 +64,6 @@ let getOptionStr = () => {
   }
   return btn;
 }
-
 
 
 let focusId = ''

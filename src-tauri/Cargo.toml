@@ -1,6 +1,6 @@
 [package]
 name = "secret-reader-helper"
-version = "1.0.0"
+version = "1.0.1"
 description = "摸鱼阅读全局快捷键拓展"
 authors = ["luoxx"]
 license = ""
