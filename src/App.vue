@@ -1,7 +1,8 @@
 <script setup>
 import { register,unregister } from '@tauri-apps/api/globalShortcut';
-import { ref } from "vue"
+import {h, ref} from "vue"
 import { invoke } from "@tauri-apps/api/tauri";
+import {ClearOutlined} from "@ant-design/icons-vue";
 
 let closeReader = ref(localStorage.getItem('short-cut-closeReader'))
 let toggleReader = ref(localStorage.getItem('short-cut-toggleReader'))
@@ -148,7 +149,34 @@ async function inputBlur(e) {
     });
     localStorage.setItem(key, curValue)
   }
+}
 
+// 清除快捷键
+async function clearKey(checkId) {
+  let key = 'short-cut-' + checkId
+  let shortCut = localStorage.getItem(key)
+  if (shortCut) {
+    await unregister(shortCut)
+    localStorage.removeItem(key)
+    if (checkId === 'closeReader') {
+      closeReader.value = ''
+    } else if (checkId === 'toggleReader') {
+      toggleReader.value = ''
+    } else if (checkId === 'prevPage') {
+      prevPage.value = ''
+    } else if (checkId === 'nextPage') {
+      nextPage.value = ''
+    } else if (checkId === 'toggleAuto') {
+      toggleAuto.value = ''
+    }
+  }
+}
+
+function  clearAllKey() {
+  let ids = ['closeReader','toggleReader','prevPage','nextPage','toggleAuto']
+  for (let i = 0; i < ids.length; i++) {
+    clearKey(ids[i])
+  }
 }
 
 </script>
@@ -162,38 +190,48 @@ async function inputBlur(e) {
         type="info" show-icon
     />
 
+    <div style="margin-top: 2rem;">
+      <a-button style="float: right; margin-right: 2rem" :icon="h(ClearOutlined)" @click="clearAllKey">清除所有快捷键</a-button>
+      <div style="clear: both"></div>
+    </div>
+
     <a-row style="margin-top: 2rem;">
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="关闭阅读器" /></a-col>
-      <a-col :span="8">
+      <a-col :span="6">
         <a-input v-model:value="closeReader" placeholder="请点击后录入快捷键" class="key-input" id="closeReader"
                  @focus="inputFocus" @blur="inputBlur" readOnly />
       </a-col>
+      <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('closeReader')"></a-button></a-col>
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="显示/隐藏阅读器" /></a-col>
-      <a-col :span="8">
+      <a-col :span="6">
         <a-input v-model:value="toggleReader" placeholder="请点击后录入快捷键" class="key-input" id="toggleReader"
                  @focus="inputFocus" @blur="inputBlur" readOnly />
       </a-col>
+      <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('toggleReader')"></a-button></a-col>
     </a-row>
 
     <a-row style="margin-top: 2rem;">
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="上一页" @focus="inputFocus" /></a-col>
-      <a-col :span="8">
+      <a-col :span="6">
         <a-input v-model:value="prevPage" placeholder="请点击后录入快捷键" class="key-input" id="prevPage"
                  @focus="inputFocus" @blur="inputBlur" readOnly />
       </a-col>
+      <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('prevPage')"></a-button></a-col>
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="下一页" @focus="inputFocus" /></a-col>
-      <a-col :span="8">
+      <a-col :span="6">
         <a-input v-model:value="nextPage" placeholder="请点击后录入快捷键" class="key-input" id="nextPage"
                  @focus="inputFocus" @blur="inputBlur" readOnly />
       </a-col>
+      <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('nextPage')"></a-button></a-col>
     </a-row>
 
     <a-row style="margin-top: 2rem;">
       <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="启/停自动翻页" /></a-col>
-      <a-col :span="8">
+      <a-col :span="6">
         <a-input v-model:value="toggleAuto" placeholder="请点击后录入快捷键" class="key-input" id="toggleAuto"
                  @focus="inputFocus" @blur="inputBlur" readOnly />
       </a-col>
+      <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('toggleAuto')"></a-button></a-col>
     </a-row>
   </div>
 </template>
@@ -210,9 +248,11 @@ async function inputBlur(e) {
 }
 .container .label{
   line-height: 32px;
-  text-indent: 6px;
+  text-indent: 3px;
+  font-size: 12px;
 }
 .container .key-input{
   background:unset;
+  width: 90%;
 }
 </style>
