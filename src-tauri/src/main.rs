@@ -23,29 +23,32 @@ fn main() {
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
-    tauri::Builder::default()
+    let mut app = tauri::Builder::default()
             .system_tray(system_tray)
             .on_system_tray_event(|app, event| menu_handle(app, event))
             .invoke_handler(tauri::generate_handler![send_tcp_msg])
             .build(tauri::generate_context!())
-            .expect("error while running tauri application")
-            .run(|app, event| match event {
-                tauri::RunEvent::WindowEvent {
-                    label,
-                    event: win_event,
-                    ..
-                } => match win_event {
-                    tauri::WindowEvent::CloseRequested { api, .. } => {
-                        let win = app.get_window(label.as_str()).unwrap();
-                        let item_handle = app.tray_handle().get_item("hide");
-                        item_handle.set_title("显示窗口").unwrap();
-                        win.hide().unwrap();
-                        api.prevent_close();
-                    }
-                    _ => {}
-                },
-                _ => {}
-            });
+            .expect("error while running tauri application");
+
+    app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
+    app.run(|app, event| match event {
+        tauri::RunEvent::WindowEvent {
+            label,
+            event: win_event,
+            ..
+        } => match win_event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                let win = app.get_window(label.as_str()).unwrap();
+                let item_handle = app.tray_handle().get_item("hide");
+                item_handle.set_title("显示窗口").unwrap();
+                win.hide().unwrap();
+                api.prevent_close();
+            }
+            _ => {}
+        },
+        _ => {}
+    });
 }
 
 fn menu_handle(app_handle: &tauri::AppHandle, event: SystemTrayEvent) {

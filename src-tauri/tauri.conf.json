@@ -69,7 +69,8 @@
         "height": 540,
         "resizable": true,
         "title": "摸鱼阅读小助手",
-        "width": 850
+        "width": 850,
+        "skipTaskbar": true
       }
     ],
     "systemTray": {
