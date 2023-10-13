@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "摸鱼阅读小助手",
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "tauri": {
     "allowlist": {
@@ -66,10 +66,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 520,
+        "height": 540,
         "resizable": true,
         "title": "摸鱼阅读小助手",
-        "width": 840
+        "width": 850
       }
     ],
     "systemTray": {
