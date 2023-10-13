@@ -9,6 +9,7 @@ let toggleReader = ref(localStorage.getItem('short-cut-toggleReader'))
 let prevPage = ref(localStorage.getItem('short-cut-prevPage'))
 let nextPage = ref(localStorage.getItem('short-cut-nextPage'))
 let toggleAuto = ref(localStorage.getItem('short-cut-toggleAuto'))
+let toggleMove = ref(localStorage.getItem('short-cut-toggleMove'))
 
 const isWin = (navigator.platform === "Win32") || (navigator.platform === "Windows")
 const isMac = (navigator.platform === "Mac68K") || (navigator.platform === "MacPPC") || (navigator.platform === "Macintosh") || (navigator.platform === "MacIntel")
@@ -36,6 +37,8 @@ async function initKeyListener() {
           sendMsg += '4&content=next'
         } else if (keyName === 'short-cut-toggleAuto') {
           sendMsg += '3'
+        } else if (keyName === 'short-cut-toggleMove') {
+          sendMsg += '5'
         }
         if (sendMsg === 'type=') {
           continue
@@ -91,6 +94,8 @@ let keyFunc = (e) => {
     nextPage.value = connect
   } else if (focusId === 'toggleAuto') {
     toggleAuto.value = connect
+  } else if (focusId === 'toggleMove') {
+    toggleMove.value = connect
   }
   e.preventDefault()
 }
@@ -122,6 +127,8 @@ async function inputBlur(e) {
       nextPage.value = tmpBeforeValue
     } else if (tmpFocusId === 'toggleAuto') {
       toggleAuto.value = tmpBeforeValue
+    } else if (tmpFocusId === 'toggleMove') {
+      toggleMove.value = tmpBeforeValue
     }
   } else if (curValue === tmpBeforeValue) {
 
@@ -142,6 +149,8 @@ async function inputBlur(e) {
       sendMsg += '4&content=next'
     } else if (tmpFocusId === 'toggleAuto') {
       sendMsg += '3'
+    } else if (tmpFocusId === 'toggleMove') {
+      sendMsg += '5'
     }
     await register(curValue, async () => {
       console.log("key trigger:",sendMsg)
@@ -168,12 +177,14 @@ async function clearKey(checkId) {
       nextPage.value = ''
     } else if (checkId === 'toggleAuto') {
       toggleAuto.value = ''
+    } else if (checkId === 'toggleMove') {
+      toggleMove.value = ''
     }
   }
 }
 
 function  clearAllKey() {
-  let ids = ['closeReader','toggleReader','prevPage','nextPage','toggleAuto']
+  let ids = ['closeReader','toggleReader','prevPage','nextPage','toggleAuto', 'toggleMove']
   for (let i = 0; i < ids.length; i++) {
     clearKey(ids[i])
   }
@@ -232,7 +243,14 @@ function  clearAllKey() {
                  @focus="inputFocus" @blur="inputBlur" readOnly />
       </a-col>
       <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('toggleAuto')"></a-button></a-col>
+      <a-col :span="4" class="label"><a-typography-text strong :ellipsis="true" content="开/关窗口移动" /></a-col>
+      <a-col :span="6">
+        <a-input v-model:value="toggleMove" placeholder="请点击后录入快捷键" class="key-input" id="toggleMove"
+                 @focus="inputFocus" @blur="inputBlur" readOnly />
+      </a-col>
+      <a-col :span="2"><a-button :icon="h(ClearOutlined)" @click="clearKey('toggleMove')"></a-button></a-col>
     </a-row>
+
   </div>
 </template>
 
